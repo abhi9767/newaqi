@@ -1,0 +1,42 @@
+# CarbonCanopy
+
+Hackathon project (Environment & Sustainability). Two separate tools, starting with **Gaindakot, Nepal**:
+
+1. **Carbon emissions**: estimate a place's annual CO₂, then compute how many trees and hectares would offset a chosen share of it.
+2. **Where to plant**: find and rank open-land parcels on the city's outskirts, using modelled air quality, prevailing wind and OpenStreetMap land use.
+
+## Run
+
+```bash
+npm install
+npm run verify:apis   # run once with internet: confirms the real API response shapes
+npm run dev           # http://localhost:3000
+```
+Checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. No API keys needed (`.env.example` lists optional overrides).
+
+## What is real and what is estimated
+
+| Item | Basis |
+|---|---|
+| Gaindakot population 79,349; area 159.93 km² | Nepal Census 2021 (as republished) |
+| CO₂ per person 0.50 t (EDGAR/IEA) or 0.63 t (Our World in Data) | **National** 2024 figures; the two sources disagree |
+| **Annual CO₂ of the city** | **Estimate** = population × national per-person value. No official city inventory exists |
+| Tree uptake 12 / 25 / 40 kg CO₂ per tree-year | Published ranges for established trees; survival (default 80%) and density are your assumptions |
+| Air quality (US AQI, PM2.5) | Open-Meteo / CAMS **model**, not ground monitors; coarse grid, so nearby sites share values |
+| Prevailing wind | Open-Meteo reanalysis, past 365 days, speed-weighted vector mean; ignored if direction is too variable |
+| Candidate sites | OpenStreetMap closed land-use ways (grass, meadow, brownfield, greenfield, scrub, grassland, heath) via Overpass; area computed from geometry |
+
+## Site score (configurable in `lib/siting.ts`)
+Weighted blend: land size 0.40, outskirts position (3-15 km band) 0.30, upwind position 0.15, modelled AQI 0.15. Missing factors are dropped and the rest re-weighted. The UI shows each parcel's breakdown. Farmland is excluded on purpose.
+
+## Limitations
+- The emissions figure is a planning estimate. It misses local sources and non-CO₂ gases.
+- Tree offsets are slow (saplings absorb little) and reversible. Afforestation does not replace cutting emissions.
+- OSM coverage is patchy in rural Nepal; multipolygon relations are skipped, so large parcels can be missing. Only the 60 largest qualifying parcels are ranked.
+- Ownership, legal status, ecology and community use must be checked on site.
+- Other countries: search any city, but enter your country's per-person CO₂ ("Custom"). Gridded data (e.g. EDGAR, Climate TRACE) is the natural next step for true local emissions.
+- The public Overpass server has fair-use limits; results are cached 30 minutes per instance.
+- Live behaviour of the four upstream APIs was not verified from the build environment.
+
+## Attribution
+Open-Meteo (CC BY 4.0) for geocoding, air quality, wind. © OpenStreetMap contributors (ODbL). Per-person CO₂: Our World in Data, EDGAR/IEA (EU JRC).

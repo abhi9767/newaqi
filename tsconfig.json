@@ -1,0 +1,7 @@
+# No API keys required. Optional overrides:
+OPEN_METEO_GEOCODING_URL=https://geocoding-api.open-meteo.com/v1/search
+OPEN_METEO_AIR_QUALITY_URL=https://air-quality-api.open-meteo.com/v1/air-quality
+OPEN_METEO_ARCHIVE_URL=https://archive-api.open-meteo.com/v1/archive
+OVERPASS_URL=https://overpass-api.de/api/interpreter
+UPSTREAM_TIMEOUT_MS=15000
+OVERPASS_TIMEOUT_MS=30000
